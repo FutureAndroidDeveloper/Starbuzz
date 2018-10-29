@@ -6,7 +6,7 @@ public class Drink {
     private int imageResourceId;
 
     // drinks in an array of drinks
-    private static final Drink[] drinks = {
+    protected static final Drink[] drinks = {
             new Drink("Latte", "A couple of espresso shots with steamed milk",
                     R.drawable.latte),
             new Drink("Cappuccino", "Espresso, hot milk, and a steamed milk foam",
