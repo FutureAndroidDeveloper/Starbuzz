@@ -92,7 +92,7 @@ public class TopLevelActivity extends Activity {
                 "FAVORITE = 1",
                 null, null, null, null);
         CursorAdapter adapter = (CursorAdapter) listFavorites.getAdapter();
-        listFavorites.setAdapter(adapter);
+        adapter.changeCursor(newCursor);
         cursor = newCursor; // Because need to close cursor in OnDestroy()
     }
 
