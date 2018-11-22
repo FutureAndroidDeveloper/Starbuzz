@@ -59,7 +59,7 @@ public class DrinkCategoryActivity extends Activity {
         listDrinks.setOnItemClickListener(itemClickListener);
     }
 
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
