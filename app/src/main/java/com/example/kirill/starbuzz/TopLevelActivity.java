@@ -17,6 +17,7 @@ import android.widget.Toast;
 public class TopLevelActivity extends Activity {
     private SQLiteDatabase database;
     private Cursor cursor;
+    private ListView listFavorites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,7 @@ public class TopLevelActivity extends Activity {
 
     private void setupFavoritesListView() {
         // Fill list_favorites from cursor
-        ListView listFavorites = (ListView) findViewById(R.id.list_favorites);
+        listFavorites = (ListView) findViewById(R.id.list_favorites);
         SQLiteOpenHelper helper = new StarbuzzDatabaseHelper(this);
 
         try {
@@ -80,6 +81,19 @@ public class TopLevelActivity extends Activity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        // Create new version of cursor
+        Cursor newCursor = database.query("DRINK",
+                new String[]{"_id", "NAME"},
+                "FAVORITE = 1",
+                null, null, null, null);
+        CursorAdapter adapter = (CursorAdapter) listFavorites.getAdapter();
+        listFavorites.setAdapter(adapter);
+        cursor = newCursor; // Because need to close cursor in OnDestroy()
     }
 
     @Override
