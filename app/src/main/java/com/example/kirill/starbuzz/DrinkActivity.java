@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
@@ -73,18 +74,43 @@ public class DrinkActivity extends Activity {
     public void onFavoriteClicked(View view) {
         int drinkId = getIntent().getIntExtra(EXTRA_DRINKID, -1);
 
-        ContentValues drinkValues = new ContentValues();
-        drinkValues.put("FAVORITE", favorite.isChecked());
+        new UpdateDrinkTask().execute(drinkId);
+    }
 
-        SQLiteOpenHelper helper = new StarbuzzDatabaseHelper(this);
-        try {
-            SQLiteDatabase database = helper.getWritableDatabase();
-            database.update("DRINK",
-                    drinkValues,
-                    "_id = ?",
-                    new String[] {Integer.toString(drinkId)});
-        } catch(SQLiteException e) {
-            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();
+    private class UpdateDrinkTask extends AsyncTask<Integer, Void, Boolean> {
+        private ContentValues drinkValues;
+
+        @Override
+        protected void onPreExecute() {
+            favorite = (CheckBox) findViewById(R.id.favorite);
+            drinkValues = new ContentValues();
+            drinkValues.put("FAVORITE", favorite.isChecked());
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... drinks) {
+            int drinkId = drinks[0];
+            SQLiteOpenHelper helper = new StarbuzzDatabaseHelper(DrinkActivity.this);
+
+            try {
+                SQLiteDatabase database = helper.getReadableDatabase();
+                database.update("DRINK",
+                        drinkValues,
+                        "_id = ?",
+                        new String[]{Integer.toString(drinkId)});
+
+                database.close();
+                return true;
+            } catch (SQLiteException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (!success) {
+                Toast.makeText(DrinkActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
